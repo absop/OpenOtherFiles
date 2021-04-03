@@ -44,3 +44,7 @@ Or **Chinese**
 }
 ```
 ![](image/cn.png)
+
+
+## TODO
+- [ ] With `popup menu`, Provide key bindings to make it easier to open other files of current directory.

@@ -10,14 +10,14 @@
                 "children":
                 [
                     {
-                        "caption": "OpenOtherFiles",
-                        "mnemonic": "O",
+                        "caption": "QuickOpenFile",
+                        "mnemonic": "Q",
                         "children":
                         [
                             {
                                 "caption": "README",
                                 "command": "open_file",
-                                "args": {"file": "${packages}/OpenOtherFiles/README.md"}
+                                "args": {"file": "${packages}/QuickOpenFile/README.md"}
                             },
                             { "caption": "-" },
                             {
@@ -25,7 +25,7 @@
                                 "command": "edit_settings",
                                 "mnemonic": "S",
                                 "args": {
-                                    "base_file": "${packages}/OpenOtherFiles/OpenOtherFiles.sublime-settings",
+                                    "base_file": "${packages}/QuickOpenFile/QuickOpenFile.sublime-settings",
                                    "default": "{\n\t$0\n}\n"
                                 }
                             }

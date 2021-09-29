@@ -1,0 +1,6 @@
+[
+    {
+        "keys": ["alt+m"],
+        "command": "show_open_files_popup_menu",
+    }
+]

@@ -1,0 +1,53 @@
+{
+    "caption": "Quick Open File",
+
+    "files_limit": 30,
+
+    "file_exclude_patterns": [
+        "*.pyc",
+        "*.pyo",
+        "*.exe",
+        "*.dll",
+        "*.obj",
+        "*.o",
+        "*.a",
+        "*.lib",
+        "*.so",
+        "*.dylib",
+        "*.ncb",
+        "*.sdf",
+        "*.suo",
+        "*.pdb",
+        "*.idb",
+        ".DS_Store",
+        ".directory",
+        "desktop.ini",
+        "*.class",
+        "*.psd",
+        "*.db"
+    ],
+
+    "menu_by_filetypes": [
+        {
+            "caption": "Open: ${file}",
+            "command": "open_file",
+            "args": {
+                "file": "${path}"
+            },
+            "exts": ".*",
+        },
+        {
+            "caption": "View: ${file}",
+            "command": "open_file_with_default_application",
+            "args": {
+                "file": "${path}"
+            },
+            "exts": [
+                ".pdf",
+                ".png",
+                ".jpg",
+                ".jpeg",
+            ]
+        }
+    ]
+}

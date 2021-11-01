@@ -12,56 +12,77 @@ except:
     raise
 
 
-class ShowOpenFilesPopupMenuCommand(sublime_plugin.TextCommand):
-    def run(self, edit):
-        items = QuickOpenFileMenuCreater.create_menu_items_for_file(
-            self.view.file_name()
-        )
-        window = self.view.window()
+class OpenFilePopupMenuCommand(sublime_plugin.TextCommand):
+    def run(self, edit, command):
+        dir = os.path.dirname(self.view.file_name() or '')
+        if not os.path.exists(dir):
+            sublime.status_message('No such directory')
+            return
+        files = []
+        for file in os.listdir(dir):
+            path = os.path.join(dir, file)
+            if os.path.isfile(path):
+                files.append(file)
+
         def on_done(index):
             if index != -1:
-                item = items[index]
-                window.run_command(
-                    item['command'],
-                    item['args']
+                file = files[index]
+                self.view.window().run_command(
+                    command,
+                    {
+                        'file': os.path.join(dir, file)
+                    }
                 )
-        self.view.show_popup_menu(
-            [item['caption'] for item in items],
-            on_done
-        )
+        self.view.show_popup_menu(files, on_done)
+
+
+class OpenWithCommand(sublime_plugin.TextCommand):
+    def is_visible(self):
+        return self.view.file_name() is not None and (
+            os.path.isfile(self.view.file_name()))
+
+    def is_enabled(self):
+        return self.view.file_name() is not None and (
+            os.path.isfile(self.view.file_name()))
+
+    def run(self, edit, command):
+        self.view.window().run_command(
+            command,
+            {
+                'file': self.view.file_name()
+            })
 
 
 class QuickOpenFileMenuCreater(menu.MenuCreater):
     def context_menu(self, event):
-        if items := self.create_menu_items_for_file(self.view.file_name()):
-            return self.folded_item(self.caption, items)
+        filepath = self.view.file_name() or ''
+        dirpath = os.path.dirname(filepath)
+        if not os.path.exists(dirpath):
+            return
 
-    @classmethod
-    def create_menu_items_for_file(cls, file_path):
-        if not os.path.exists(file_path or ""):
-            return None
-        items = []
-        dir_path, leaf = os.path.split(file_path)
-        for file in os.listdir(dir_path):
-            if file == leaf or cls.exclude_file(file):
+        subitems = self.subitems
+        for menu in self.menus:
+            menu.items.clear()
+        files = 0
+        for file in os.listdir(dirpath):
+            if self.exclude_file(file):
                 continue
-            path = os.path.join(dir_path, file)
+            path = os.path.join(dirpath, file)
             if os.path.isfile(path):
                 ext = os.path.splitext(file)[1]
-                if ext not in cls.menu_by_filetypes:
+                if ext not in subitems:
                     ext = '.*'
+                if ext not in subitems:
+                    continue
                 variables = {'file': file, 'path': path}
-                menu = cls.menu_by_filetypes[ext]
-                caption = sublime.expand_variables(menu.caption, variables)
-                command = menu.command
-                args = {
-                    argn: sublime.expand_variables(argv, variables)
-                    for argn, argv in menu.args.items()
-                }
-                item = cls.item(None, caption, command, args)
-                items.append(item)
-                if len(items) == cls.files_limit:
+                for menu in subitems[ext]:
+                    menu.add_item(file, variables)
+                files += 1
+                if files == self.files_limit:
                     break
+        items = [menu.folded() for menu in self.menus if menu.items]
+        if items and self.fold_subitems:
+            return self.folded_item(self.caption, items)
         return items
 
     @classmethod
@@ -70,35 +91,50 @@ class QuickOpenFileMenuCreater(menu.MenuCreater):
         cls.exclude_file = pat2regex(file_exclude_patterns).match
         cls.caption = settings.get('caption', 'Quick Open File')
         cls.files_limit = settings.get('files_limit', 30)
-        cls.menu_by_filetypes = {}
-        for obj in settings.get('menu_by_filetypes', []):
+        cls.fold_subitems = settings.get('fold_subitems', True)
+        cls.subitems = {}
+        cls.menus = []
+        for obj in settings.get('subitems', []):
             caption = obj.get('caption', '')
             command = obj.get('command', '')
             args = obj.get('args', {})
             exts = obj.get('exts', [])
-            if caption and command and args and exts:
-                menu = Menu(caption, command, args)
-                if isinstance(exts, list):
-                    for ext in exts:
-                        cls.menu_by_filetypes[ext] = menu
-                elif isinstance(exts, str):
-                    cls.menu_by_filetypes[exts] = menu
-        if '.*' not in cls.menu_by_filetypes:
-            default_menu = Menu(
-                'Open: ${file}',
-                'open_file',
-                {'file': '${path}'}
-            )
-            cls.menu_by_filetypes['.*'] = default_menu
+            if not (caption and command and args and exts):
+                continue
+
+            if isinstance(exts, str):
+                exts = [exts]
+            if not isinstance(exts, list):
+                continue
+
+            menu = Menu(caption, command, args)
+            cls.menus.append(menu)
+            for ext in exts:
+                if ext not in cls.subitems:
+                    cls.subitems[ext] = []
+                cls.subitems[ext].append(menu)
 
 
 class Menu:
-    __slots__ = ['caption', 'command', 'args']
+    __slots__ = ['caption', 'command', 'args', 'items']
 
     def __init__(self, caption, command, args):
         self.caption = caption
         self.command = command
         self.args = args
+        self.items = []
+
+    def add_item(self, caption, variables):
+        item = menu.MenuCreater.item(
+            None, caption, self.command,
+            {
+                key: sublime.expand_variables(value, variables)
+                for key, value in self.args.items()
+            })
+        self.items.append(item)
+
+    def folded(self):
+        return menu.MenuCreater.folded_item(None, self.caption, self.items)
 
 
 def pat2regex(patterns):

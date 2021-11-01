@@ -1,6 +1,48 @@
 {
     "caption": "Quick Open File",
 
+    "fold_subitems": true,
+
+    "subitems": [
+        {
+            "caption": "Open with Sublime Text",
+            "command": "open_file",
+            "args": {
+                "file": "${path}"
+            },
+            "exts": ".*",
+        },
+        {
+            "caption": "Open with",
+            "command": "open_file_with",
+            "args": {
+                "file": "${path}"
+            },
+            "exts": ".*",
+        },
+        {
+            "caption": "Open with Default App",
+            "command": "open_file_with_default_application",
+            "args": {
+                "file": "${path}"
+            },
+            "exts": ".*",
+        },
+        {
+            "caption": "View Images",
+            "command": "open_file_with_default_application",
+            "args": {
+                "file": "${path}"
+            },
+            "exts": [
+                ".pdf",
+                ".png",
+                ".jpg",
+                ".jpeg",
+            ]
+        }
+    ],
+
     "files_limit": 30,
 
     "file_exclude_patterns": [
@@ -25,29 +67,5 @@
         "*.class",
         "*.psd",
         "*.db"
-    ],
-
-    "menu_by_filetypes": [
-        {
-            "caption": "Open: ${file}",
-            "command": "open_file",
-            "args": {
-                "file": "${path}"
-            },
-            "exts": ".*",
-        },
-        {
-            "caption": "View: ${file}",
-            "command": "open_file_with_default_application",
-            "args": {
-                "file": "${path}"
-            },
-            "exts": [
-                ".pdf",
-                ".png",
-                ".jpg",
-                ".jpeg",
-            ]
-        }
     ]
 }

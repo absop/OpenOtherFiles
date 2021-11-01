@@ -1,0 +1,10 @@
+[
+    {
+        "caption": "Preferences: QuickOpenFile Settings",
+        "command": "edit_settings",
+        "args": {
+            "base_file": "${packages}/QuickOpenFile/QuickOpenFile.sublime-settings",
+            "default": "{\n\t$0\n}\n"
+        }
+    }
+]

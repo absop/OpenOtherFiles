@@ -1,6 +1,16 @@
 [
     {
         "keys": ["alt+m"],
-        "command": "show_open_files_popup_menu",
+        "command": "open_file_popup_menu",
+        "args": {
+            "command": "open_file"
+        }
+    },
+    {
+        "keys": ["alt+shift+m"],
+        "command": "open_file_popup_menu",
+        "args": {
+            "command": "open_file_with_default_application"
+        }
     }
 ]

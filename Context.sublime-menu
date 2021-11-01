@@ -1,0 +1,17 @@
+[
+    { "caption": "-", "id": "file" },
+    {
+        "caption": "Open With",
+        "command": "open_with",
+        "args": {
+            "command": "open_file_with"
+        },
+    },
+    {
+        "caption": "Open With Default Application",
+        "command": "open_with",
+        "args": {
+            "command": "open_file_with_default_application"
+        },
+    },
+]

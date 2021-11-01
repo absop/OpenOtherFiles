@@ -21,20 +21,44 @@ The following steps assume that you already have [Package Control](https://packa
 
 
 ## Examples
-If you mainly use **English**
-```json
-{
-    "caption": "Quick Open File"
-}
-```
+If you mainly use **English**, with the default settings, click the right mouse button, you will get menu similar to the one shown below
 ![](image/en.png)
 
-Or **Chinese**
+
+Or **Chinese**, with the following settings
 ```json
 {
-    "caption": "打开其他文件"
+  "caption" : "快速打开文件",
+
+  "subitems" : [
+    {
+      "caption" : "在Sublime Text中打开",
+      "command" : "open_file",
+      "args" : {"file" : "${path}"},
+      "exts" : ".*"
+    },
+    {
+      "caption" : "选择打开方式",
+      "command" : "open_file_with",
+      "args" : {"file" : "${path}"},
+      "exts" : ".*"
+    },
+    {
+      "caption" : "用默认应用打开",
+      "command" : "open_file_with_default_application",
+      "args" : {"file" : "${path}"},
+      "exts" : ".*"
+    },
+    {
+      "caption" : "查看图片",
+      "command" : "open_file_with_default_application",
+      "args" : {"file" : "${path}"},
+      "exts" : [ ".pdf", ".png", ".jpg", ".jpeg" ]
+    }
+  ]
 }
 ```
+the plugin will crate some menus like this for you
 ![](image/cn.png)
 
 
@@ -46,8 +70,17 @@ Quick open files with popup menu.
 [
     {
         "keys": ["alt+m"],
-        "command": "show_open_files_popup_menu",
+        "command": "open_file_popup_menu",
+        "args": {
+            "command": "open_file"
+        }
+    },
+    {
+        "keys": ["alt+shift+m"],
+        "command": "open_file_popup_menu",
+        "args": {
+            "command": "open_file_with_default_application"
+        }
     }
 ]
 ```
-![](image/popup_menu.png)

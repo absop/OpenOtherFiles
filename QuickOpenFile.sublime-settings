@@ -1,7 +1,9 @@
 {
-    "caption": "Quick Open File",
-
     "fold_subitems": true,
+
+    "files_limit": 30,
+
+    "caption": "Quick Open File",
 
     "subitems": [
         {
@@ -42,8 +44,6 @@
             ]
         }
     ],
-
-    "files_limit": 30,
 
     "file_exclude_patterns": [
         "*.pyc",

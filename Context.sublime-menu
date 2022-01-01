@@ -11,6 +11,7 @@
         "caption": "Open With Default Application",
         "command": "open_with",
         "args": {
+            // Command defined in dctxmenu
             "command": "open_file_with_default_application"
         },
     },

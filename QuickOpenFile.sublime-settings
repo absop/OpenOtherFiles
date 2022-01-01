@@ -1,18 +1,25 @@
 {
-    "fold_subitems": true,
-
-    "files_limit": 30,
+    "items_limit": 30,
 
     "caption": "Quick Open File",
 
-    "subitems": [
+    "folder_menus": [
+        {
+            "caption": "Open In Explorer",
+            "command": "open_dir",
+            "args": {
+                "dir": "${path}"
+            }
+        }
+    ],
+
+    "file_menus": [
         {
             "caption": "Open with Sublime Text",
             "command": "open_file",
             "args": {
                 "file": "${path}"
             },
-            "exts": ".*",
         },
         {
             "caption": "Open with",
@@ -20,7 +27,6 @@
             "args": {
                 "file": "${path}"
             },
-            "exts": ".*",
         },
         {
             "caption": "Open with Default App",
@@ -28,7 +34,6 @@
             "args": {
                 "file": "${path}"
             },
-            "exts": ".*",
         },
         {
             "caption": "View Images",
@@ -36,11 +41,11 @@
             "args": {
                 "file": "${path}"
             },
-            "exts": [
-                ".pdf",
-                ".png",
-                ".jpg",
-                ".jpeg",
+            "selector": [
+                "*.pdf",
+                "*.png",
+                "*.jpg",
+                "*.jpeg",
             ]
         }
     ],

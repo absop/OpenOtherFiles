@@ -4,12 +4,24 @@ import re
 import sublime
 import sublime_plugin
 
+from sublime import expand_variables
+
 try:
     from dctxmenu import menu
 except:
     sublime.error_message(
         f'The plugin `dctxmenu` is not installed, {__package__} stoped')
     raise
+
+
+class OpenFileWithCommand(sublime_plugin.TextCommand):
+    def run(self, edit, file):
+        if sublime.platform() == 'windows':
+            os.popen('OpenWith.exe "%s"' % file)
+        elif sublime.platform() == 'osx':
+            subprocess.call(['open', file])
+        elif sublime.platform() == 'linux':
+            subprocess.call(['xdg-open', file])
 
 
 class OpenFilePopupMenuCommand(sublime_plugin.TextCommand):
@@ -54,87 +66,80 @@ class OpenWithCommand(sublime_plugin.TextCommand):
 
 
 class QuickOpenFileMenuCreater(menu.MenuCreater):
-    def context_menu(self, event):
-        filepath = self.view.file_name() or ''
-        dirpath = os.path.dirname(filepath)
-        if not os.path.exists(dirpath):
-            return
-
-        subitems = self.subitems
-        for menu in self.menus:
-            menu.items.clear()
-        files = 0
-        for file in os.listdir(dirpath):
-            if self.exclude_file(file):
-                continue
-            path = os.path.join(dirpath, file)
-            if os.path.isfile(path):
-                ext = os.path.splitext(file)[1]
-                if ext not in subitems:
-                    ext = '.*'
-                if ext not in subitems:
-                    continue
-                variables = {'file': file, 'path': path}
-                for menu in subitems[ext]:
-                    menu.add_item(file, variables)
-                files += 1
-                if files == self.files_limit:
-                    break
-        items = [menu.folded() for menu in self.menus if menu.items]
-        if items and self.fold_subitems:
-            return self.folded_item(self.caption, items)
-        return items
-
     @classmethod
     def init(cls):
         file_exclude_patterns = settings.get('file_exclude_patterns', [])
         cls.exclude_file = pat2regex(file_exclude_patterns).match
         cls.caption = settings.get('caption', 'Quick Open File')
-        cls.files_limit = settings.get('files_limit', 30)
-        cls.fold_subitems = settings.get('fold_subitems', True)
-        cls.subitems = {}
-        cls.menus = []
-        for obj in settings.get('subitems', []):
-            caption = obj.get('caption', '')
-            command = obj.get('command', '')
-            args = obj.get('args', {})
-            exts = obj.get('exts', [])
-            if not (caption and command and args and exts):
+        cls.items_limit = settings.get('items_limit', 30)
+        cls.folder_menus = []
+        cls.file_menus = []
+
+        for menu in settings.get('folder_menus', []):
+            caption = menu.get('caption', '')
+            command = menu.get('command', '')
+            args = menu.get('args', {})
+            if not (caption and command and args):
                 continue
+            cls.folder_menus.append((caption, command, args))
 
-            if isinstance(exts, str):
-                exts = [exts]
-            if not isinstance(exts, list):
+        for menu in settings.get('file_menus', []):
+            caption = menu.get('caption', '')
+            command = menu.get('command', '')
+            args = menu.get('args', {})
+            if not (caption and command and args):
                 continue
+            selector = Selector(menu.get('selector', []))
+            cls.file_menus.append((caption, command, args, selector))
 
-            menu = Menu(caption, command, args)
-            cls.menus.append(menu)
-            for ext in exts:
-                if ext not in cls.subitems:
-                    cls.subitems[ext] = []
-                cls.subitems[ext].append(menu)
+    def make_folder_menu(self, folder, variables):
+        return self.folded_item(folder, [
+            self.item(caption, command, expand_variables(args, variables))
+            for caption, command, args in self.folder_menus
+        ])
+
+    def make_file_menu(self, file, variables):
+        return self.folded_item(file, [
+            self.item(caption, command, expand_variables(args, variables))
+            for caption, command, args, selector in self.file_menus
+                if selector.select(file)
+        ])
+
+    def context_menu(self, event):
+        filepath = self.view.file_name() or ''
+        dirpath = os.path.dirname(filepath)
+        if not os.path.exists(dirpath):
+            return
+        items = []
+        for file in os.listdir(dirpath):
+            if self.exclude_file(file):
+                continue
+            path = os.path.join(dirpath, file)
+            variables = {'file': file, 'path': path}
+            if os.path.isfile(path):
+                item = self.make_file_menu(file, variables)
+            else:
+                item = self.make_folder_menu(file, variables)
+            items.append(item)
+            if len(items) >= self.items_limit:
+                break
+        if items:
+            return self.folded_item(self.caption, items)
+        return items
 
 
-class Menu:
-    __slots__ = ['caption', 'command', 'args', 'items']
+class Selector:
+    __slots__ = ['regex']
 
-    def __init__(self, caption, command, args):
-        self.caption = caption
-        self.command = command
-        self.args = args
-        self.items = []
+    def __init__(self, patterns):
+        if not patterns:
+            patterns = ["*"]
+        elif isinstance(patterns, str):
+            patterns = [patterns]
+        self.regex = pat2regex(patterns)
 
-    def add_item(self, caption, variables):
-        item = menu.MenuCreater.item(
-            None, caption, self.command,
-            {
-                key: sublime.expand_variables(value, variables)
-                for key, value in self.args.items()
-            })
-        self.items.append(item)
-
-    def folded(self):
-        return menu.MenuCreater.folded_item(None, self.caption, self.items)
+    def select(self, name):
+        return self.regex.match(name) is not None
 
 
 def pat2regex(patterns):

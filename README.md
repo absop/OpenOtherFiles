@@ -28,36 +28,33 @@ If you mainly use **English**, with the default settings, click the right mouse 
 Or **Chinese**, with the following settings
 ```json
 {
-    "caption" : "快速打开文件",
+    "caption" : "快速打开",
 
-    "subitems" : [
+    "file_menus" : [
         {
             "caption" : "在Sublime Text中打开",
             "command" : "open_file",
             "args" : {"file" : "${path}"},
-            "exts" : ".*"
         },
         {
             "caption" : "选择打开方式",
             "command" : "open_file_with",
             "args" : {"file" : "${path}"},
-            "exts" : ".*"
         },
         {
             "caption" : "用默认应用打开",
             "command" : "open_file_with_default_application",
             "args" : {"file" : "${path}"},
-            "exts" : ".*"
         },
         {
             "caption" : "查看图片",
             "command" : "open_file_with_default_application",
             "args" : {"file" : "${path}"},
-            "exts" : [
-                ".pdf",
-                ".png",
-                ".jpg",
-                ".jpeg"
+            "selector" : [
+                "*.pdf",
+                "*.png",
+                "*.jpg",
+                "*.jpeg"
             ]
         }
     ]

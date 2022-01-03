@@ -14,16 +14,6 @@ except:
     raise
 
 
-class OpenFileWithCommand(sublime_plugin.TextCommand):
-    def run(self, edit, file):
-        if sublime.platform() == 'windows':
-            os.popen('OpenWith.exe "%s"' % file)
-        elif sublime.platform() == 'osx':
-            subprocess.call(['open', file])
-        elif sublime.platform() == 'linux':
-            subprocess.call(['xdg-open', file])
-
-
 class OpenFilePopupMenuCommand(sublime_plugin.TextCommand):
     def run(self, edit, command):
         dir = os.path.dirname(self.view.file_name() or '')

@@ -1,11 +1,12 @@
 # QuickOpenFile
 
 ## Feature
-Dynamically generate context menus for you, allowing you to open other files in the current directory with the right mouse button.
-![](image/en.png)
 
+Dynamically generate context menus for you, allowing you to open other files in the current directory with the right mouse button.
+![English menu](image/en.png)
 
 ## Installation
+
 This plugin depends on the [dctxmenu](https://github.com/absop/dctxmenu) plugin. Before installing this plugin, you must install `dctxmenu` plugin.
 
 The following steps assume that you already have [Package Control](https://packagecontrol.io/) installed.
@@ -19,13 +20,13 @@ The following steps assume that you already have [Package Control](https://packa
    2. Input `pcip(Package Control: Install Package)`
    3. Input `QuickOpenFile`
 
-
 ## Examples
-If you mainly use **English**, with the default settings, click the right mouse button, you will get menu similar to the one shown below
-![](image/en.png)
 
+If you mainly use **English**, with the default settings, click the right mouse button, you will get menu similar to the one shown below
+![English menu](image/en.png)
 
 Or **Chinese**, with the following settings
+
 ```json
 {
     "caption" : "快速打开",
@@ -60,9 +61,9 @@ Or **Chinese**, with the following settings
     ]
 }
 ```
-the plugin will crate some menus like this for you
-![](image/cn.png)
 
+the plugin will crate some menus like this for you
+![Chinese menu](image/cn.png)
 
 ## Key Bindings
 
